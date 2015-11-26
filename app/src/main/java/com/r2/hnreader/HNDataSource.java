@@ -6,9 +6,13 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
-/**
- * Created by rren2 on 11/25/2015.
- */
+import com.alibaba.fastjson.JSON;
+import com.squareup.okhttp.Response;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+
 public class HNDataSource {
     private SQLiteDatabase sqLiteDatabase;
     private HNSQLiteHelper hnsqLiteHelper;
@@ -69,9 +73,46 @@ public class HNDataSource {
         return item;
 
     }
-
-    public void freshTops() {
-
+    public void updateTopTable() {
+        new StoriesJsonTask().execute("https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty");
     }
+    private void freshTopStoriesTable(List<Integer> list) {
+        hnsqLiteHelper.onDeleteTopTable(sqLiteDatabase);
+        for (int i = 0; i != list.size(); i++) {
+            ContentValues values = new ContentValues();
+            values.put(HNSQLiteHelper.COLUMN_TOP_ID, list.get(i));
+            sqLiteDatabase.insert(HNSQLiteHelper.TABLE_TOP, null, values);
+        }
+    }
+    private void freshNewStoriesTable(List<Integer> list) {
+        //// TODO: 11/25/2015 new stories table 
+    }
+    private class StoriesJsonTask extends GeneralRequestTask {
+        @Override
+        protected Object doInBackground(String... params) {
+            Object result = super.doInBackground(params);
+            List<Integer> number = new ArrayList<>();
+            if (result != null) {
+                Response response = (Response) result;
+                String jsonString = null;
+                if (response.code() == 200) {
+                    try {
+                        jsonString = response.body().string();
+                    } catch (IOException ioe) {
+                        ioe.printStackTrace();
+                    }
+                }
+                if (jsonString != null) {
+                    number = JSON.parseArray(jsonString, Integer.class);
+                }
+            }
+            return number;
+        }
 
+        @Override
+        protected void onPostExecute(Object o) {
+            super.onPostExecute(o);
+            freshTopStoriesTable((List<Integer>) o);
+        }
+    }
 }

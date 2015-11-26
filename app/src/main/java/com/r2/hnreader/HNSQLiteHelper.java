@@ -4,9 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-/**
- * Created by rren2 on 11/25/2015.
- */
+
 public class HNSQLiteHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "data.db";
@@ -31,6 +29,8 @@ public class HNSQLiteHelper extends SQLiteOpenHelper {
     //top table create statement
     private static final String CREATE_TABLE_TOP = "CREATE TABLE " + TABLE_TOP + "(" + COLUMN_TOP_ID + " INTEGER PRIMARY KEY," +
             COLUMN_TOP_ITEM_ID + " INTEGER);";
+    //delete top table statement
+    private static final String DELETE_TABLE_TOP = "DELETE FROM " + TABLE_TOP + ";";
 
     public HNSQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -47,4 +47,7 @@ public class HNSQLiteHelper extends SQLiteOpenHelper {
         //// TODO: 11/25/2015 onUpgrade 
     }
 
+    public void onDeleteTopTable(SQLiteDatabase db) {
+        db.execSQL(DELETE_TABLE_TOP);
+    }
 }
