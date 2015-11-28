@@ -18,6 +18,7 @@ public class HNSQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_ITEM_SCORE = "score";
     public static final String COLUMN_ITEM_TITLE = "title";
     public static final String COLUMN_ITEM_DESC = "descendants";
+    public static final String COLUMN_ITEM_TEXT = "text";
     public static final String TABLE_TOP = "tops";
     public static final String COLUMN_TOP_ID = "_top_id";
     public static final String COLUMN_TOP_ITEM_ID = "item_id";
@@ -25,7 +26,7 @@ public class HNSQLiteHelper extends SQLiteOpenHelper {
     //item table create statement
     private static final String CREATE_TABLE_ITEM = "CREATE TABLE " + TABLE_ITEM + "(" + COLUMN_ITEM_ID + " INTEGER PRIMARY KEY," +
             COLUMN_ITEM_TYPE + " TEXT," + COLUMN_ITEM_AUTHOR + " TEXT," + COLUMN_ITEM_PARENT + " INTEGER," + COLUMN_ITEM_URL + " TEXT," +
-            COLUMN_ITEM_SCORE + " INTEGER," + COLUMN_ITEM_TITLE + " TEXT," + COLUMN_ITEM_DESC + " INTEGER);";
+            COLUMN_ITEM_SCORE + " INTEGER," + COLUMN_ITEM_TEXT + " TEXT," + COLUMN_ITEM_TITLE + " TEXT," + COLUMN_ITEM_DESC + " INTEGER);";
     //top table create statement
     private static final String CREATE_TABLE_TOP = "CREATE TABLE " + TABLE_TOP + "(" + COLUMN_TOP_ID + " INTEGER PRIMARY KEY," +
             COLUMN_TOP_ITEM_ID + " INTEGER);";
