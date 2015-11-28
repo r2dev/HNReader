@@ -1,5 +1,6 @@
 package com.r2.hnreader;
 
+import android.content.ClipData;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -60,22 +61,40 @@ public class HNDataSource {
         return newItem;
     }
 
+    public void insertItem(Item item) {
+        ContentValues values = new ContentValues();
+        System.out.println(item);
+        values.put(HNSQLiteHelper.COLUMN_ITEM_TYPE, item.getType());
+        values.put(HNSQLiteHelper.COLUMN_ITEM_AUTHOR, item.getBy());
+        values.put(HNSQLiteHelper.COLUMN_ITEM_PARENT, item.getParent());
+        values.put(HNSQLiteHelper.COLUMN_ITEM_URL, item.getUrl());
+        values.put(HNSQLiteHelper.COLUMN_ITEM_SCORE, item.getScore());
+        values.put(HNSQLiteHelper.COLUMN_ITEM_TITLE, item.getTitle());
+        values.put(HNSQLiteHelper.COLUMN_ITEM_DESC, item.getDescendants());
+        sqLiteDatabase.insert(HNSQLiteHelper.TABLE_ITEM, null, values);
+    }
+
+    public void updateTopTable() {
+        new StoriesJsonTask().execute("https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty");
+    }
+
+    public void getItemFromUrl(String url) {
+        new ItemJsonTask().execute(url);
+    }
+
     private Item cursorToItem(Cursor cursor) {
         Item item = new Item();
         item.setId(cursor.getLong(0));
         item.setType(cursor.getString(1));
-        item.setUser(cursor.getString(2));
-        item.setParent_id(cursor.getLong(3));
+        item.setBy(cursor.getString(2));
+        item.setParent(cursor.getLong(3));
         item.setUrl(cursor.getString(4));
         item.setScore(cursor.getInt(5));
         item.setTitle(cursor.getString(6));
         item.setDescendants(cursor.getInt(7));
         return item;
+    }
 
-    }
-    public void updateTopTable() {
-        new StoriesJsonTask().execute("https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty");
-    }
     private void freshTopStoriesTable(List<Integer> list) {
         hnsqLiteHelper.onDeleteTopTable(sqLiteDatabase);
         for (int i = 0; i != list.size(); i++) {
@@ -86,6 +105,37 @@ public class HNDataSource {
     }
     private void freshNewStoriesTable(List<Integer> list) {
         //// TODO: 11/25/2015 new stories table 
+    }
+    private class ItemJsonTask extends GeneralRequestTask {
+        private Item item = null;
+        @Override
+        protected Object doInBackground(String... params) {
+            Object result = super.doInBackground(params);
+            Item item = new Item();
+            if (result != null) {
+                Response response = (Response) result;
+                String jsonString = null;
+                if (response.code() == 200) {
+                    try {
+                        jsonString = response.body().string();
+                    } catch (IOException ioe) {
+                        ioe.printStackTrace();
+                    }
+                }
+                if (jsonString != null) {
+                    item = JSON.parseObject(jsonString, Item.class);
+                }
+            }
+            return item;
+        }
+
+        @Override
+        protected void onPostExecute(Object o) {
+            super.onPostExecute(o);
+            item = (Item)o;
+            insertItem(item);
+        }
+
     }
     private class StoriesJsonTask extends GeneralRequestTask {
         @Override
