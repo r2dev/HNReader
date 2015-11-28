@@ -1,17 +1,16 @@
 package com.r2.hnreader;
 
-/**
- * Created by rren2 on 11/25/2015.
- */
 public class Item {
+    // TODO: 11/28/2015 need add text
     private long id;
     private String type;
-    private String user;
-    private long parent_id;
+    private String by;
+    private long parent;
     private String url;
     private int score;
     private String title;
     private int descendants;
+    private String text;
 
     public long getId() {
         return id;
@@ -29,20 +28,20 @@ public class Item {
         this.type = type;
     }
 
-    public String getUser() {
-        return user;
+    public String getBy() {
+        return by;
     }
 
-    public void setUser(String user) {
-        this.user = user;
+    public void setBy(String user) {
+        this.by = user;
     }
 
-    public long getParent_id() {
-        return parent_id;
+    public long getParent() {
+        return parent;
     }
 
-    public void setParent_id(long parent_id) {
-        this.parent_id = parent_id;
+    public void setParent(long parent) {
+        this.parent = parent;
     }
 
     public String getUrl() {
@@ -77,17 +76,26 @@ public class Item {
         this.descendants = descendants;
     }
 
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
     @Override
     public String toString() {
         return "Item{" +
                 "id=" + id +
                 ", type='" + type + '\'' +
-                ", user='" + user + '\'' +
-                ", parent_id=" + parent_id +
+                ", by='" + by + '\'' +
+                ", parent=" + parent +
                 ", url='" + url + '\'' +
                 ", score=" + score +
                 ", title='" + title + '\'' +
                 ", descendants=" + descendants +
+                ", text='" + text + '\'' +
                 '}';
     }
 }

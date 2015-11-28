@@ -21,6 +21,8 @@ public class MainActivity extends AppCompatActivity {
         dataSource =  new HNDataSource(this);
         dataSource.openForWriting();
         dataSource.updateTopTable();
+        dataSource.getItemFromUrl("https://hacker-news.firebaseio.com/v0/item/121003.json?print=pretty");
+
     }
 
     @Override
