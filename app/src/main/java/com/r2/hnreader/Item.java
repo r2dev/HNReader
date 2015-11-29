@@ -1,7 +1,6 @@
 package com.r2.hnreader;
 
 public class Item {
-    // TODO: 11/28/2015 need add text
     private long id;
     private String type;
     private String by;
