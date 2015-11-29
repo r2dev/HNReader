@@ -10,7 +10,7 @@ public class HNSQLiteHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "data.db";
     public static final int DATABASE_VERSION = 1;
     public static final String TABLE_ITEM = "items";
-    public static final String COLUMN_ITEM_ID = "_id";
+    public static final String COLUMN_ITEM_ID = "item_id";
     public static final String COLUMN_ITEM_TYPE = "type";
     public static final String COLUMN_ITEM_AUTHOR = "user";
     public static final String COLUMN_ITEM_PARENT = "parent_id";
@@ -20,7 +20,7 @@ public class HNSQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_ITEM_DESC = "descendants";
     public static final String COLUMN_ITEM_TEXT = "text";
     public static final String TABLE_TOP = "tops";
-    public static final String COLUMN_TOP_ID = "_top_id";
+    public static final String COLUMN_TOP_ID = "top_id";
     public static final String COLUMN_TOP_ITEM_ID = "item_id";
 
     //item table create statement
