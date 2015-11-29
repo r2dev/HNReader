@@ -9,6 +9,9 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
     private HNDataSource dataSource;
     @Override
@@ -21,8 +24,11 @@ public class MainActivity extends AppCompatActivity {
         dataSource =  new HNDataSource(this);
         dataSource.openForWriting();
         dataSource.updateTopTable();
-        dataSource.getItemFromUrl("https://hacker-news.firebaseio.com/v0/item/121003.json?print=pretty");
-
+        List<Long> test = new ArrayList<>();
+        test.add((long)10641871);
+        test.add((long)10641604);
+        test.add((long)10642351);
+        System.out.println(dataSource.storeListItem(test));
     }
 
     @Override
