@@ -1,6 +1,6 @@
 package com.r2.hnreader;
 
-import android.content.ClipData;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -53,17 +53,23 @@ public class HNDataSource {
         values.put(HNSQLiteHelper.COLUMN_ITEM_TITLE, title);
         values.put(HNSQLiteHelper.COLUMN_ITEM_DESC, descendants);
         long insertId = sqLiteDatabase.insert(HNSQLiteHelper.TABLE_ITEM, null, values);
-        Cursor cursor = sqLiteDatabase.query(HNSQLiteHelper.TABLE_ITEM, allColumns, HNSQLiteHelper.COLUMN_ITEM_ID + " = " +
-                insertId, null, null, null, null);
-        cursor.moveToFirst();
-        Item newItem = cursorToItem(cursor);
-        cursor.close();
+        Item newItem = getItem(insertId);
         return newItem;
+    }
+
+    public Item getItem(long i) {
+        Cursor cursor = sqLiteDatabase.query(HNSQLiteHelper.TABLE_ITEM, allColumns,
+                HNSQLiteHelper.COLUMN_ITEM_ID + " = " + i, null, null, null, null);
+        cursor.moveToFirst();
+        Item item = cursorToItem(cursor);
+        cursor.close();
+        return item;
     }
 
     public void insertItem(Item item) {
         ContentValues values = new ContentValues();
         System.out.println(item);
+        values.put(HNSQLiteHelper.COLUMN_ITEM_ID, item.getId());
         values.put(HNSQLiteHelper.COLUMN_ITEM_TYPE, item.getType());
         values.put(HNSQLiteHelper.COLUMN_ITEM_AUTHOR, item.getBy());
         values.put(HNSQLiteHelper.COLUMN_ITEM_PARENT, item.getParent());
@@ -74,11 +80,27 @@ public class HNDataSource {
         sqLiteDatabase.insert(HNSQLiteHelper.TABLE_ITEM, null, values);
     }
 
+    public List<Item> storeListItem(List<Long> idList) {
+        List<Item> items = new ArrayList<>();
+        for (int i = 0; i != idList.size(); i++) {
+            if (!isInItemTable(idList.get(i))) {
+                String url = "https://hacker-news.firebaseio.com/v0/item/" + String.valueOf(idList.get(i)) + ".json?print=pretty";
+                storeItemFromUrl(url);
+            }
+            items.add(getItem(idList.get(i)));
+        }
+        return items;
+    }
+
     public void updateTopTable() {
         new StoriesJsonTask().execute("https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty");
     }
-
-    public void getItemFromUrl(String url) {
+    public List<List<Long>> getPartialIdList(String tableName, int partialSize) {
+        //// TODO: 11/29/2015  
+        List<List<Long>> listList = new ArrayList<>();
+        return listList;
+    }
+    public void storeItemFromUrl(String url) {
         new ItemJsonTask().execute(url);
     }
 
@@ -95,15 +117,32 @@ public class HNDataSource {
         return item;
     }
 
-    private void freshTopStoriesTable(List<Integer> list) {
+    /**http://stackoverflow.com/a/20416004/1639012
+     *
+     * @param id
+     * @return boolean
+     */
+    private boolean isInItemTable(Long id) {
+        boolean result;
+        Cursor cursor = sqLiteDatabase.query(HNSQLiteHelper.TABLE_ITEM, allColumns,
+                HNSQLiteHelper.COLUMN_ITEM_ID + " = " + id, null, null, null, null);
+        if (cursor.getCount() <= 0) {
+            result = false;
+        } else {
+            result = true;
+        }
+        cursor.close();
+        return result;
+    }
+    private void freshTopStoriesTable(List<Long> list) {
         hnsqLiteHelper.onDeleteTopTable(sqLiteDatabase);
         for (int i = 0; i != list.size(); i++) {
             ContentValues values = new ContentValues();
-            values.put(HNSQLiteHelper.COLUMN_TOP_ID, list.get(i));
+            values.put(HNSQLiteHelper.COLUMN_TOP_ITEM_ID, list.get(i));
             sqLiteDatabase.insert(HNSQLiteHelper.TABLE_TOP, null, values);
         }
     }
-    private void freshNewStoriesTable(List<Integer> list) {
+    private void freshNewStoriesTable(List<Long> list) {
         //// TODO: 11/25/2015 new stories table 
     }
     private class ItemJsonTask extends GeneralRequestTask {
@@ -141,7 +180,7 @@ public class HNDataSource {
         @Override
         protected Object doInBackground(String... params) {
             Object result = super.doInBackground(params);
-            List<Integer> number = new ArrayList<>();
+            List<Long> number = new ArrayList<>();
             if (result != null) {
                 Response response = (Response) result;
                 String jsonString = null;
@@ -153,7 +192,7 @@ public class HNDataSource {
                     }
                 }
                 if (jsonString != null) {
-                    number = JSON.parseArray(jsonString, Integer.class);
+                    number = JSON.parseArray(jsonString, Long.class);
                 }
             }
             return number;
@@ -162,7 +201,7 @@ public class HNDataSource {
         @Override
         protected void onPostExecute(Object o) {
             super.onPostExecute(o);
-            freshTopStoriesTable((List<Integer>) o);
+            freshTopStoriesTable((List<Long>) o);
         }
     }
 }
