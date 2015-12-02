@@ -24,11 +24,10 @@ public class MainActivity extends AppCompatActivity {
         dataSource =  new HNDataSource(this);
         dataSource.openForWriting();
         dataSource.updateTopTable();
-        List<Long> test = new ArrayList<>();
-        test.add((long)10641871);
-        test.add((long)10641604);
-        test.add((long)10642351);
-        System.out.println(dataSource.storeListItem(test));
+        List<Long> a = dataSource.getNext10ItemFromTable(HNSQLiteHelper.TABLE_TOP, HNSQLiteHelper.COLUMN_TOP_ID);
+        System.out.println(a);
+        System.out.println(dataSource.storeAndGetListItem(a));
+        dataSource.close();
     }
 
     @Override
