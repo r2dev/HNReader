@@ -15,6 +15,7 @@ import java.util.List;
 
 
 public class HNDataSource {
+    private static int flagCurrentSetInTopTable = 0;
     private SQLiteDatabase sqLiteDatabase;
     private HNSQLiteHelper hnsqLiteHelper;
     private String[] allColumns = {
@@ -60,7 +61,9 @@ public class HNDataSource {
     public Item getItem(long i) {
         Cursor cursor = sqLiteDatabase.query(HNSQLiteHelper.TABLE_ITEM, allColumns,
                 HNSQLiteHelper.COLUMN_ITEM_ID + " = " + i, null, null, null, null);
-        cursor.moveToFirst();
+        if (cursor != null) {
+            cursor.moveToFirst();
+        }
         Item item = cursorToItem(cursor);
         cursor.close();
         return item;
@@ -80,7 +83,7 @@ public class HNDataSource {
         sqLiteDatabase.insert(HNSQLiteHelper.TABLE_ITEM, null, values);
     }
 
-    public List<Item> storeListItem(List<Long> idList) {
+    public List<Item> storeAndGetListItem(List<Long> idList) {
         List<Item> items = new ArrayList<>();
         for (int i = 0; i != idList.size(); i++) {
             if (!isInItemTable(idList.get(i))) {
@@ -94,12 +97,27 @@ public class HNDataSource {
 
     public void updateTopTable() {
         new StoriesJsonTask().execute("https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty");
+        flagCurrentSetInTopTable = 0;
     }
-    public List<List<Long>> getPartialIdList(String tableName, int partialSize) {
-        //// TODO: 11/29/2015  
-        List<List<Long>> listList = new ArrayList<>();
-        return listList;
+
+    public List<Long> getNext10ItemFromTable(String tableName, String tableId) {
+        List<Long> result = new ArrayList<>();
+        Cursor cursor = sqLiteDatabase.query(tableName, new String[]{HNSQLiteHelper.COLUMN_TOP_ITEM_ID},
+                tableId + ">=" + flagCurrentSetInTopTable + " AND " + tableId + "<=" + flagCurrentSetInTopTable + 10,
+                null, null, null, null);
+
+        if (cursor.moveToFirst()) {
+            while (!cursor.isAfterLast()) {
+                result.add(cursor.getLong(0));
+                cursor.moveToNext();
+            }
+        }
+        cursor.close();
+        flagCurrentSetInTopTable += 10;
+        return result;
+
     }
+
     public void storeItemFromUrl(String url) {
         new ItemJsonTask().execute(url);
     }
