@@ -8,6 +8,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,10 +26,13 @@ public class MainActivity extends AppCompatActivity {
         dataSource =  new HNDataSource(this);
         dataSource.openForWriting();
         dataSource.updateTopTable();
-        List<Long> a = dataSource.getNext10ItemFromTable(HNSQLiteHelper.TABLE_TOP, HNSQLiteHelper.COLUMN_TOP_ID);
+        ListView lv = (ListView)findViewById(R.id.listView);
+        List<Long> longList = dataSource.getNext10ItemFromTable(HNSQLiteHelper.TABLE_TOP, HNSQLiteHelper.COLUMN_TOP_ID);
+        dataSource.storeListItem(longList);
+        List<Item> a = dataSource.getListItem(longList);
         System.out.println(a);
-        System.out.println(dataSource.storeAndGetListItem(a));
-        dataSource.close();
+        ArrayAdapter<Item> itemArrayAdapter = new ArrayAdapter<Item>(this, android.R.layout.simple_list_item_1, a);
+        lv.setAdapter(itemArrayAdapter);
     }
 
     @Override
