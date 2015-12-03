@@ -63,15 +63,15 @@ public class HNDataSource {
                 HNSQLiteHelper.COLUMN_ITEM_ID + " = " + i, null, null, null, null);
         if (cursor != null) {
             cursor.moveToFirst();
+            Item item = cursorToItem(cursor);
+            cursor.close();
+            return item;
         }
-        Item item = cursorToItem(cursor);
-        cursor.close();
-        return item;
+        return null;
     }
 
     public void insertItem(Item item) {
         ContentValues values = new ContentValues();
-        System.out.println(item);
         values.put(HNSQLiteHelper.COLUMN_ITEM_ID, item.getId());
         values.put(HNSQLiteHelper.COLUMN_ITEM_TYPE, item.getType());
         values.put(HNSQLiteHelper.COLUMN_ITEM_AUTHOR, item.getBy());
@@ -83,16 +83,21 @@ public class HNDataSource {
         sqLiteDatabase.insert(HNSQLiteHelper.TABLE_ITEM, null, values);
     }
 
-    public List<Item> storeAndGetListItem(List<Long> idList) {
-        List<Item> items = new ArrayList<>();
+    public void storeListItem(List<Long> idList) {
         for (int i = 0; i != idList.size(); i++) {
             if (!isInItemTable(idList.get(i))) {
                 String url = "https://hacker-news.firebaseio.com/v0/item/" + String.valueOf(idList.get(i)) + ".json?print=pretty";
                 storeItemFromUrl(url);
             }
-            items.add(getItem(idList.get(i)));
         }
-        return items;
+    }
+
+    public List<Item> getListItem(List<Long> idList) {
+        List<Item> result = new ArrayList<>();
+        for (int i = 0; i != idList.size(); i++) {
+            result.add(getItem(idList.get(i)));
+        }
+        return result;
     }
 
     public void updateTopTable() {
@@ -113,7 +118,11 @@ public class HNDataSource {
             }
         }
         cursor.close();
-        flagCurrentSetInTopTable += 10;
+        if (result.size() < 10) {
+            flagCurrentSetInTopTable = 0;
+        } else {
+            flagCurrentSetInTopTable += 10;
+        }
         return result;
 
     }
@@ -190,6 +199,7 @@ public class HNDataSource {
         protected void onPostExecute(Object o) {
             super.onPostExecute(o);
             item = (Item)o;
+            System.out.println(item);
             insertItem(item);
         }
 
