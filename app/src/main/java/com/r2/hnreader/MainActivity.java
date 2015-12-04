@@ -11,11 +11,16 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.alibaba.fastjson.JSON;
+import com.squareup.okhttp.Response;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private HNDataSource dataSource;
+    private List<Item> items;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,14 +30,8 @@ public class MainActivity extends AppCompatActivity {
         //test
         dataSource =  new HNDataSource(this);
         dataSource.openForWriting();
-        dataSource.updateTopTable();
-        ListView lv = (ListView)findViewById(R.id.listView);
-        List<Long> longList = dataSource.getNext10ItemFromTable(HNSQLiteHelper.TABLE_TOP, HNSQLiteHelper.COLUMN_TOP_ID);
-        dataSource.storeListItem(longList);
-        List<Item> a = dataSource.getListItem(longList);
-        System.out.println(a);
-        ArrayAdapter<Item> itemArrayAdapter = new ArrayAdapter<Item>(this, android.R.layout.simple_list_item_1, a);
-        lv.setAdapter(itemArrayAdapter);
+        new StoriesJsonTask().execute("https://hacker-news.firebaseio.com/v0/topstories.json");
+        new ItemJsonTask().execute("https://hacker-news.firebaseio.com/v0/item/8863.json");
     }
 
     @Override
@@ -56,5 +55,66 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private class StoriesJsonTask extends GeneralRequestTask {
+        @Override
+        protected Object doInBackground(String... params) {
+            Object result = super.doInBackground(params);
+            List<Long> number = new ArrayList<>();
+            if (result != null) {
+                Response response = (Response) result;
+                String jsonString = null;
+                if (response.code() == 200) {
+                    try {
+                        jsonString = response.body().string();
+                    } catch (IOException ioe) {
+                        ioe.printStackTrace();
+                    }
+                }
+                if (jsonString != null) {
+                    number = JSON.parseArray(jsonString, Long.class);
+                }
+            }
+            return number;
+        }
+        @Override
+        protected void onPostExecute(Object o) {
+            super.onPostExecute(o);
+            dataSource.freshTopStoriesTable((List<Long>) o);
+        }
+    }
+
+
+    private class ItemJsonTask extends GeneralRequestTask {
+        private Item item = null;
+        @Override
+        protected Object doInBackground(String... params) {
+            Object result = super.doInBackground(params);
+            Item item = new Item();
+            if (result != null) {
+                Response response = (Response) result;
+                String jsonString = null;
+                if (response.code() == 200) {
+                    try {
+                        jsonString = response.body().string();
+                    } catch (IOException ioe) {
+                        ioe.printStackTrace();
+                    }
+                }
+                if (jsonString != null) {
+                    item = JSON.parseObject(jsonString, Item.class);
+                }
+            }
+            return item;
+        }
+
+        @Override
+        protected void onPostExecute(Object o) {
+            super.onPostExecute(o);
+            item = (Item)o;
+            System.out.println(item);
+        }
+
     }
 }
