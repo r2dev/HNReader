@@ -7,10 +7,6 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.alibaba.fastjson.JSON;
-import com.squareup.okhttp.Response;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -74,7 +70,7 @@ public class HNDataSource {
         values.put(HNSQLiteHelper.COLUMN_ITEM_SCORE, item.getScore());
         values.put(HNSQLiteHelper.COLUMN_ITEM_TITLE, item.getTitle());
         values.put(HNSQLiteHelper.COLUMN_ITEM_DESC, item.getDescendants());
-        sqLiteDatabase.insert(HNSQLiteHelper.TABLE_ITEM, null, values);
+        sqLiteDatabase.insertWithOnConflict(HNSQLiteHelper.TABLE_ITEM, null, values, SQLiteDatabase.CONFLICT_REPLACE);
     }
 
     private Item cursorToItem(Cursor cursor) {
