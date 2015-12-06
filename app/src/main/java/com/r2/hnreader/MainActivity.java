@@ -10,8 +10,6 @@ import android.view.MenuItem;
 import android.os.AsyncTask;
 import android.view.View;
 import android.widget.AbsListView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
@@ -43,10 +41,9 @@ public class MainActivity extends AppCompatActivity {
         dataSource.openForWriting();
         //fresh and store top table data
 
-        new StoriesJsonTask().execute("https://hacker-news.firebaseio.com/v0/topstories.json");
         ListView listView = (ListView) findViewById(R.id.listView);
-
         itemArrayAdapter = new StoryAdapter(this, R.layout.story_row, items);
+        new StoriesJsonTask().execute("https://hacker-news.firebaseio.com/v0/topstories.json");
         listView.setAdapter(itemArrayAdapter);
     }
 
@@ -57,7 +54,13 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-
+    private void freshTopStories() {
+        //onscroll at bottom add 10 which will skip the first ten item so -10 here
+        flagReadingTop = -10;
+        items.clear();
+        itemArrayAdapter.notifyDataSetChanged();
+        new StoriesJsonTask().execute("https://hacker-news.firebaseio.com/v0/topstories.json");
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -71,7 +74,10 @@ public class MainActivity extends AppCompatActivity {
             //to do setting page!
             return true;
         }
-
+        if (id == R.id.action_fresh_top) {
+            freshTopStories();
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -101,10 +107,10 @@ public class MainActivity extends AppCompatActivity {
             super.onPostExecute(o);
             dataSource.freshTopStoriesTable((List<Long>) o);
             idArray = (List<Long>) o;
-
             new ItemsNetworkRequest().execute(flagReadingTop);
         }
     }
+
     private class ItemsNetworkRequest extends AsyncTask<Integer, Void, List<Item>> {
         private OkHttpClient client = new OkHttpClient();
         private List<Long> idList = new ArrayList<>();
@@ -169,7 +175,6 @@ public class MainActivity extends AppCompatActivity {
                         flagReadingTop += 10;
                         new ItemsNetworkRequest().execute(flagReadingTop);
                         progressBar.setVisibility(View.VISIBLE);
-
                     }
                 }
             });
