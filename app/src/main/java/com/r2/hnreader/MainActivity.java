@@ -23,11 +23,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    private HNDataSource dataSource;
+  //  private HNDataSource dataSource;
     private List<Item> items = new ArrayList<>();
     private StoryAdapter itemArrayAdapter;
     private List<Long> idArray = new ArrayList<>();
-    private static int flagReadingTop = 0;
     private ProgressBar progressBar;
     private boolean loadingMore = false;
     @Override
@@ -37,8 +36,8 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        dataSource = new HNDataSource(this);
-        dataSource.openForWriting();
+//        dataSource = new HNDataSource(this);
+//        dataSource.openForWriting();
         //fresh and store top table data
 
         ListView listView = (ListView) findViewById(R.id.listView);
@@ -55,8 +54,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void freshTopStories() {
-        //onscroll at bottom add 10 which will skip the first ten item so -10 here
-        flagReadingTop = -10;
         items.clear();
         itemArrayAdapter.notifyDataSetChanged();
         new StoriesJsonTask().execute("https://hacker-news.firebaseio.com/v0/topstories.json");
@@ -105,9 +102,9 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Object o) {
             super.onPostExecute(o);
-            dataSource.freshTopStoriesTable((List<Long>) o);
             idArray = (List<Long>) o;
-            new ItemsNetworkRequest().execute(flagReadingTop);
+            new ItemsNetworkRequest().execute(0);
+//            dataSource.freshTopStoriesTable((List<Long>) o);
         }
     }
 
@@ -118,6 +115,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             idList = idArray;
+
         }
 
         @Override
@@ -147,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
                         item = JSON.parseObject(jsonString, Item.class);
                         System.out.println(item);
                         listItem.add(item);
-                        dataSource.insertItem(item);
+                        //dataSource.insertItem(item);
                     }
                 }
             }
@@ -169,12 +167,14 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                    int lastInScreen = firstVisibleItem + visibleItemCount;
-                    if (lastInScreen == items.size() && (loadingMore)) {
-                        loadingMore = false;
-                        flagReadingTop += 10;
-                        new ItemsNetworkRequest().execute(flagReadingTop);
-                        progressBar.setVisibility(View.VISIBLE);
+                    if (totalItemCount != 0) {
+                        int lastInScreen = firstVisibleItem + visibleItemCount;
+                        if (lastInScreen == items.size() && (loadingMore)) {
+                            loadingMore = false;
+
+                            new ItemsNetworkRequest().execute(lastInScreen);
+                            progressBar.setVisibility(View.VISIBLE);
+                        }
                     }
                 }
             });
