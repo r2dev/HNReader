@@ -9,9 +9,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.os.AsyncTask;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import com.alibaba.fastjson.JSON;
 import com.squareup.okhttp.OkHttpClient;
@@ -25,26 +27,27 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
     private HNDataSource dataSource;
     private List<Item> items = new ArrayList<>();
-    private ArrayAdapter<Item> itemArrayAdapter;
+    private StoryAdapter itemArrayAdapter;
     private List<Long> idArray = new ArrayList<>();
-    private int flagReadingTop = 0;
+    private static int flagReadingTop = 0;
+    private ProgressBar progressBar;
+    private boolean loadingMore = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        //test
+
         dataSource = new HNDataSource(this);
         dataSource.openForWriting();
         //fresh and store top table data
+
         new StoriesJsonTask().execute("https://hacker-news.firebaseio.com/v0/topstories.json");
         ListView listView = (ListView) findViewById(R.id.listView);
 
-        itemArrayAdapter = new ArrayAdapter<Item>(this,
-                android.R.layout.simple_list_item_1, items);
+        itemArrayAdapter = new StoryAdapter(this, R.layout.story_row, items);
         listView.setAdapter(itemArrayAdapter);
-
     }
 
     @Override
@@ -98,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
             super.onPostExecute(o);
             dataSource.freshTopStoriesTable((List<Long>) o);
             idArray = (List<Long>) o;
-            System.out.println(idArray);
+
             new ItemsNetworkRequest().execute(flagReadingTop);
         }
     }
@@ -148,17 +151,28 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(List<Item> listItem) {
+            loadingMore = true;
             items.addAll(listItem);
             itemArrayAdapter.notifyDataSetChanged();
-            //add more button
-            Button button = (Button)findViewById(R.id.button);
-            button.setOnClickListener(new View.OnClickListener() {
+            progressBar = (ProgressBar) findViewById(R.id.progressBar);
+            progressBar.setVisibility(View.INVISIBLE);
+            ListView listView = (ListView) findViewById(R.id.listView);
+            listView.setOnScrollListener(new AbsListView.OnScrollListener() {
                 @Override
-                public void onClick(View v) {
-                    new ItemsNetworkRequest().execute(flagReadingTop+10);
+                public void onScrollStateChanged(AbsListView view, int scrollState) {}
+
+                @Override
+                public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                    int lastInScreen = firstVisibleItem + visibleItemCount;
+                    if (lastInScreen == items.size() && (loadingMore)) {
+                        loadingMore = false;
+                        flagReadingTop += 10;
+                        new ItemsNetworkRequest().execute(flagReadingTop);
+                        progressBar.setVisibility(View.VISIBLE);
+
+                    }
                 }
             });
-
         }
     }
 
