@@ -6,7 +6,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -60,6 +62,19 @@ public class HNDataSource {
         return item;
     }
 
+    public List<Item> getItems() {
+        List<Item> items = new ArrayList<>();
+        Cursor cursor = sqLiteDatabase.query(HNSQLiteHelper.TABLE_ITEM,
+                allColumns, null, null, null, null, null);
+        cursor.moveToFirst();
+        while(!cursor.isAfterLast()) {
+            Item item = cursorToItem(cursor);
+            items.add(item);
+            cursor.moveToNext();
+        }
+        cursor.close();
+        return items;
+    }
     public void insertItem(Item item) {
         ContentValues values = new ContentValues();
         values.put(HNSQLiteHelper.COLUMN_ITEM_ID, item.getId());

@@ -1,7 +1,9 @@
 package com.r2.hnreader;
 
+import android.content.Intent;
 import android.os.Bundle;
 
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -10,6 +12,7 @@ import android.view.MenuItem;
 import android.os.AsyncTask;
 import android.view.View;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
@@ -35,13 +38,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-//        dataSource = new HNDataSource(this);
-//        dataSource.openForWriting();
-        //fresh and store top table data
-
+        FloatingActionButton fabAddButton = (FloatingActionButton)findViewById(R.id.fab_add);
+        FloatingActionButton fabShardButton = (FloatingActionButton)findViewById(R.id.fab_share);
+        fabAddButton.hide();
+        fabShardButton.hide();
         ListView listView = (ListView) findViewById(R.id.listView);
-        itemArrayAdapter = new StoryAdapter(this, R.layout.story_row, items);
+        itemArrayAdapter = new StoryAdapter(this, R.layout.story_row, items,
+                fabAddButton, fabShardButton, MainActivity.this);
         new StoriesJsonTask().execute("https://hacker-news.firebaseio.com/v0/topstories.json");
         listView.setAdapter(itemArrayAdapter);
     }
@@ -73,6 +76,12 @@ public class MainActivity extends AppCompatActivity {
         }
         if (id == R.id.action_fresh_top) {
             freshTopStories();
+            return true;
+        }
+        if (id == R.id.action_local_data) {
+            //go get local data
+            Intent intent = new Intent(this, LocalDataActivity.class);
+            startActivity(intent);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -143,7 +152,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                     if (jsonString != null) {
                         item = JSON.parseObject(jsonString, Item.class);
-                        System.out.println(item);
                         listItem.add(item);
                         //dataSource.insertItem(item);
                     }
@@ -171,7 +179,6 @@ public class MainActivity extends AppCompatActivity {
                         int lastInScreen = firstVisibleItem + visibleItemCount;
                         if (lastInScreen == items.size() && (loadingMore)) {
                             loadingMore = false;
-
                             new ItemsNetworkRequest().execute(lastInScreen);
                             progressBar.setVisibility(View.VISIBLE);
                         }

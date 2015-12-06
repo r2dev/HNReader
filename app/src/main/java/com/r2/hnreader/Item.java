@@ -4,12 +4,21 @@ public class Item {
     private long id;
     private String type;
     private String by;
+    private long time;
     private long parent;
     private String url;
     private int score;
     private String title;
     private int descendants;
     private String text;
+
+    public long getTime() {
+        return time;
+    }
+
+    public void setTime(long time) {
+        this.time = time;
+    }
 
     public long getId() {
         return id;
@@ -89,6 +98,7 @@ public class Item {
                 "id=" + id +
                 ", type='" + type + '\'' +
                 ", by='" + by + '\'' +
+                ", time=" + time +
                 ", parent=" + parent +
                 ", url='" + url + '\'' +
                 ", score=" + score +

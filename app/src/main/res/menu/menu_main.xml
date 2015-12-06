@@ -10,7 +10,12 @@
     <item
         android:id="@+id/action_fresh_top"
         android:orderInCategory="100"
-        android:title="Update"
+        android:title="@string/action_fresh_top"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_local_data"
+        android:orderInCategory="100"
+        android:title="@string/action_local_data"
         app:showAsAction="never" />
 
 </menu>
