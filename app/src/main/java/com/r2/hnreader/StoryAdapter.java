@@ -32,9 +32,11 @@ public class StoryAdapter extends ArrayAdapter<Item>{
 
         final Item p = getItem(position);
         if (p != null) {
+            TextView score = (TextView)v.findViewById(R.id.storyScore);
             TextView title = (TextView)v.findViewById(R.id.storyTitle);
             TextView url = (TextView)v.findViewById(R.id.storyUrl);
             TextView author = (TextView)v.findViewById(R.id.author);
+
             if (title != null) {
                 title.setText(p.getTitle());
             }
@@ -50,6 +52,9 @@ public class StoryAdapter extends ArrayAdapter<Item>{
             }
             if (author != null) {
                 author.setText(p.getBy());
+            }
+            if (score != null) {
+                score.setText(String.valueOf(p.getScore()));
             }
         }
         return v;
