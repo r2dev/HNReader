@@ -23,7 +23,6 @@ public class LocalDataActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_local_data);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-
         setSupportActionBar(toolbar);
         FloatingActionButton fabShare = (FloatingActionButton) findViewById(R.id.fab_share_2);
         ListView listView = (ListView) findViewById(R.id.listView2);

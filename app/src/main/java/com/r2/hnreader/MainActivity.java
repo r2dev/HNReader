@@ -1,6 +1,8 @@
 package com.r2.hnreader;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 
 import android.support.design.widget.FloatingActionButton;
@@ -14,6 +16,7 @@ import android.view.View;
 import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.squareup.okhttp.OkHttpClient;
@@ -25,13 +28,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    private List<Item> items = new ArrayList<>();
+    private static List<Item> items = new ArrayList<>();
     private StoryAdapter itemArrayAdapter;
-    private List<Long> idArray = new ArrayList<>();
+    private static List<Long> idArray = new ArrayList<>();
     private ProgressBar progressBar;
-    private boolean loadingMore = false;
+    private boolean internetConnection;
+    private ListView listView;
+    private static boolean loadingMore = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        internetConnection = false;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -40,12 +46,25 @@ public class MainActivity extends AppCompatActivity {
         FloatingActionButton fabShardButton = (FloatingActionButton)findViewById(R.id.fab_share);
         fabAddButton.hide();
         fabShardButton.hide();
-        ListView listView = (ListView) findViewById(R.id.listView);
+
+        internetConnection = checkInternetConnection();
+        listView = (ListView) findViewById(R.id.listView);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
         itemArrayAdapter = new StoryAdapter(this, R.layout.story_row, items,
                 fabAddButton, fabShardButton, MainActivity.this);
         //query list item from top
-        new StoriesJsonTask().execute("https://hacker-news.firebaseio.com/v0/topstories.json");
-        listView.setAdapter(itemArrayAdapter);
+        if (internetConnection) {
+            if (items.size() == 0 && idArray.size() == 0) {
+                new StoriesJsonTask().execute("https://hacker-news.firebaseio.com/v0/topstories.json");
+            } else {
+                progressBar.setVisibility(View.INVISIBLE);
+                new ItemsNetworkRequest().execute(items.size());
+            }
+            listView.setAdapter(itemArrayAdapter);
+        } else {
+            progressBar.setVisibility(View.INVISIBLE);
+            Toast.makeText(this, "No Internet Connection", Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
@@ -59,9 +78,17 @@ public class MainActivity extends AppCompatActivity {
      * Update function
      */
     private void freshTopStories() {
-        items.clear();
-        itemArrayAdapter.notifyDataSetChanged();
-        new StoriesJsonTask().execute("https://hacker-news.firebaseio.com/v0/topstories.json");
+        internetConnection = checkInternetConnection();
+        if (internetConnection) {
+            items.clear();
+            if (listView.getAdapter() == null) {
+                listView.setAdapter(itemArrayAdapter);
+            }
+            itemArrayAdapter.notifyDataSetChanged();
+            new StoriesJsonTask().execute("https://hacker-news.firebaseio.com/v0/topstories.json");
+        } else {
+            Toast.makeText(this, "No Internet Connection", Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
@@ -91,6 +118,18 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * check internet connection from system service
+     * @return boolean
+     */
+    private boolean checkInternetConnection() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager.getActiveNetworkInfo() != null &&connectivityManager.getActiveNetworkInfo().isAvailable() && connectivityManager.getActiveNetworkInfo().isConnected()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
     /**
      * Request List of id from story url
      */
@@ -133,7 +172,6 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             idList = idArray;
-
         }
 
         @Override
@@ -141,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
             List<Item> listItem = new ArrayList<>();
             int startPoint = params[0];
             for (int i = startPoint; i != startPoint + 10; i++) {
-                Item item = null;
+                Item item;
                 Request request = new Request.Builder().url("https://hacker-news.firebaseio.com/v0/item/" +
                         String.valueOf(idList.get(i)) + ".json").addHeader("Accept", "application/json").build();
                 Response response = null;

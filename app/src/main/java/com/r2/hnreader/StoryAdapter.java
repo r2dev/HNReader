@@ -82,7 +82,7 @@ public class StoryAdapter extends ArrayAdapter<Item>{
                                             @Override
                                             public void onClick(View v) {
                                                 dataSource.insertItem(p);
-                                                Toast.makeText(act, "Success", Toast.LENGTH_LONG).show();
+                                                Toast.makeText(act, "Favorite", Toast.LENGTH_LONG).show();
                                                 snackbar.dismiss();
                                                 fabAdd.hide();
                                                 fabShare.hide();
