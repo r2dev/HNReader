@@ -53,7 +53,15 @@ public class StoryAdapter extends ArrayAdapter<Item>{
                     System.out.println(p);
                     //http://stackoverflow.com/questions/742171/longclick-event-also-triggers-click-event
                     // return true instead of false to avoid tragging simple click
-                    Snackbar.make(v, "by " + p.getBy() + " " + getTimeAgo(p.getTime()), Snackbar.LENGTH_LONG)
+                    Snackbar.make(v, null, Snackbar.LENGTH_LONG)
+                            .setAction("by " + p.getBy() + " " + getTimeAgo(p.getTime()), new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Intent intent = new Intent(act, UserActivity.class);
+                                    intent.putExtra("username", p.getBy());
+                                    act.startActivity(intent);
+                                }
+                            })
                             .setCallback(new Snackbar.Callback() {
                                 @Override
                                 public void onDismissed(Snackbar snackbar, int event) {
@@ -109,14 +117,18 @@ public class StoryAdapter extends ArrayAdapter<Item>{
             }
             if (url != null) {
                 //http://stackoverflow.com/questions/2201917/how-can-i-open-a-url-in-androids-web-browser-from-my-application
-                url.setText(Uri.parse(p.getUrl()).getHost());
-                v.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(p.getUrl()));
-                        getContext().startActivity(intent);
-                    }
-                });
+                if (p.getUrl() != null) {
+                    url.setText(Uri.parse(p.getUrl()).getHost());
+                    v.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(p.getUrl()));
+                            getContext().startActivity(intent);
+                        }
+                    });
+                } else {
+                    url.setText("No url provide");
+                }
             }
             if (score != null) {
                 score.setText(String.valueOf(p.getScore()));
