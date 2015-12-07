@@ -4,6 +4,10 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import java.io.IOException;
 
+/**
+ * This is a General json request class which queries one json object from giving url
+ * in a separate thread using okhttp
+ */
 public class GeneralRequestTask extends AsyncTask<String, Void, Object> {
     private OkHttpClient client = new OkHttpClient();
     @Override

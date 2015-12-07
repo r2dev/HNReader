@@ -12,6 +12,9 @@ import android.widget.ListView;
 import java.lang.reflect.Array;
 import java.util.List;
 
+/**
+ * activity class for viewing the local database
+ */
 public class LocalDataActivity extends AppCompatActivity {
     private HNDataSource dataSource;
     private List<Item> itemList;

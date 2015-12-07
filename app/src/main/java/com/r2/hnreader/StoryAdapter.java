@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.text.format.Time;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +15,9 @@ import android.widget.Toast;
 
 import java.util.List;
 
+/**
+ * custom story adapter
+ */
 public class StoryAdapter extends ArrayAdapter<Item>{
     private FloatingActionButton fabAdd, fabShare;
     private HNDataSource dataSource;
@@ -35,7 +37,6 @@ public class StoryAdapter extends ArrayAdapter<Item>{
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View v = convertView;
-
         if (v == null) {
             LayoutInflater vi;
             vi = LayoutInflater.from(getContext());
@@ -47,6 +48,7 @@ public class StoryAdapter extends ArrayAdapter<Item>{
             TextView score = (TextView)v.findViewById(R.id.storyScore);
             TextView title = (TextView)v.findViewById(R.id.storyTitle);
             TextView url = (TextView)v.findViewById(R.id.storyUrl);
+            //when user long press the story
             v.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
@@ -127,7 +129,7 @@ public class StoryAdapter extends ArrayAdapter<Item>{
                         }
                     });
                 } else {
-                    url.setText("No url provide");
+                    url.setText("no url provide");
                 }
             }
             if (score != null) {
@@ -137,6 +139,7 @@ public class StoryAdapter extends ArrayAdapter<Item>{
         return v;
     }
     //http://stackoverflow.com/questions/13018550/time-since-ago-library-for-android-java
+    //return "10 mins ago" type of string from unix timestamp
     public static String getTimeAgo(long time) {
         int SECOND_MILLIS = 1000;
         int MINUTE_MILLIS = 60 * SECOND_MILLIS;

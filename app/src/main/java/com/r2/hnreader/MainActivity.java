@@ -12,7 +12,6 @@ import android.view.MenuItem;
 import android.os.AsyncTask;
 import android.view.View;
 import android.widget.AbsListView;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
@@ -26,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-  //  private HNDataSource dataSource;
     private List<Item> items = new ArrayList<>();
     private StoryAdapter itemArrayAdapter;
     private List<Long> idArray = new ArrayList<>();
@@ -45,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
         ListView listView = (ListView) findViewById(R.id.listView);
         itemArrayAdapter = new StoryAdapter(this, R.layout.story_row, items,
                 fabAddButton, fabShardButton, MainActivity.this);
+        //query list item from top
         new StoriesJsonTask().execute("https://hacker-news.firebaseio.com/v0/topstories.json");
         listView.setAdapter(itemArrayAdapter);
     }
@@ -56,6 +55,9 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * Update function
+     */
     private void freshTopStories() {
         items.clear();
         itemArrayAdapter.notifyDataSetChanged();
@@ -89,6 +91,9 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Request List of id from story url
+     */
     private class StoriesJsonTask extends GeneralRequestTask {
         @Override
         protected Object doInBackground(String... params) {
@@ -114,11 +119,13 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(Object o) {
             super.onPostExecute(o);
             idArray = (List<Long>) o;
+            //get first 10 items
             new ItemsNetworkRequest().execute(0);
-//            dataSource.freshTopStoriesTable((List<Long>) o);
         }
     }
-
+    /**
+     * Request 10 items each time and add the items to the global item array
+     */
     private class ItemsNetworkRequest extends AsyncTask<Integer, Void, List<Item>> {
         private OkHttpClient client = new OkHttpClient();
         private List<Long> idList = new ArrayList<>();
@@ -155,7 +162,6 @@ public class MainActivity extends AppCompatActivity {
                     if (jsonString != null) {
                         item = JSON.parseObject(jsonString, Item.class);
                         listItem.add(item);
-                        //dataSource.insertItem(item);
                     }
                 }
             }
@@ -171,6 +177,7 @@ public class MainActivity extends AppCompatActivity {
             progressBar = (ProgressBar) findViewById(R.id.progressBar);
             progressBar.setVisibility(View.INVISIBLE);
             ListView listView = (ListView) findViewById(R.id.listView);
+            // next request when user scrolls to the bottom of the list
             listView.setOnScrollListener(new AbsListView.OnScrollListener() {
                 @Override
                 public void onScrollStateChanged(AbsListView view, int scrollState) {}

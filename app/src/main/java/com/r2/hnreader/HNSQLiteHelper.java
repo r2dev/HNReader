@@ -3,7 +3,12 @@ package com.r2.hnreader;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
+/**
+ * HNSqliteHelper provides basic information about tops and items table, and provide easy access for
+ * datasouce class
+ */
 
 public class HNSQLiteHelper extends SQLiteOpenHelper {
 
@@ -45,7 +50,12 @@ public class HNSQLiteHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        //// TODO: 11/25/2015 onUpgrade 
+        Log.w(HNSQLiteHelper.class.getName(),
+                "Upgrading database from version " + oldVersion + " to "
+                        + newVersion + ", which will destroy all old data");
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ITEM);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_TOP);
+        onCreate(db);
     }
 
     public void onDeleteTopTable(SQLiteDatabase db) {

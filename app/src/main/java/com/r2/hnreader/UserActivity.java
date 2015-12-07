@@ -17,6 +17,9 @@ import com.squareup.okhttp.Response;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * user activity when receive the username from mainactivity then request the information
+ */
 public class UserActivity extends AppCompatActivity {
     private TextView nameField;
     private TextView timeField;
@@ -35,6 +38,9 @@ public class UserActivity extends AppCompatActivity {
         String url = "https://hacker-news.firebaseio.com/v0/user/" + user + ".json";
         new UserJsonTask().execute(url);
     }
+    /**
+     * Thread task to request one user from user
+     */
     private class UserJsonTask extends GeneralRequestTask {
         @Override
         protected Object doInBackground(String... params) {
@@ -55,8 +61,6 @@ public class UserActivity extends AppCompatActivity {
                     u.setId(object.getString("id"));
                     u.setAbout(object.getString("about"));
                     u.setCreated(object.getLong("created"));
-
-
                 }
             }
             return u;
@@ -71,6 +75,10 @@ public class UserActivity extends AppCompatActivity {
             aboutField.setText(u.getAbout());
         }
     }
+
+    /**
+     * User class for parsing
+     */
     private class User {
         private String about;
         private long created;

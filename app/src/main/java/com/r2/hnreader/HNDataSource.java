@@ -6,12 +6,14 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * This class provide basic database utilities including create database, get writing and reading
+ * permission, close database connection, create item, Read items from item table,
+ */
 public class HNDataSource {
     private SQLiteDatabase sqLiteDatabase;
     private HNSQLiteHelper hnsqLiteHelper;
@@ -40,7 +42,6 @@ public class HNDataSource {
     public void close() {
         hnsqLiteHelper.close();
     }
-
     public Item createItem(String type, String user, long parent_id, String url, int score, String title, int descendants) {
         ContentValues values = new ContentValues();
         Item item = null;
@@ -85,9 +86,10 @@ public class HNDataSource {
         values.put(HNSQLiteHelper.COLUMN_ITEM_SCORE, item.getScore());
         values.put(HNSQLiteHelper.COLUMN_ITEM_TITLE, item.getTitle());
         values.put(HNSQLiteHelper.COLUMN_ITEM_DESC, item.getDescendants());
+        //avoid sql exception from duplicate insert
         sqLiteDatabase.insertWithOnConflict(HNSQLiteHelper.TABLE_ITEM, null, values, SQLiteDatabase.CONFLICT_REPLACE);
     }
-
+    // convert from cursor to item instance
     private Item cursorToItem(Cursor cursor) {
         Item item = new Item();
         item.setId(cursor.getLong(0));

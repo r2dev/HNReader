@@ -45,7 +45,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="ren"
         android:id="@+id/nameField"
         android:layout_above="@+id/textView2"
         android:layout_toEndOf="@+id/textView" />
@@ -54,7 +53,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="15 days ago"
         android:id="@+id/timeField"
         android:layout_above="@+id/textView3"
         android:layout_toEndOf="@+id/textView2" />
@@ -63,7 +61,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="dasfasasdfasdfasdfaadsf"
         android:layout_toEndOf="@+id/textView3"
         android:id="@+id/aboutField"
         android:layout_alignTop="@+id/textView3"

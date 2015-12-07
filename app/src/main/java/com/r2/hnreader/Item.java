@@ -1,5 +1,8 @@
 package com.r2.hnreader;
 
+/**
+ * item class provide for fastjson library to parse json file
+ */
 public class Item {
     private long id;
     private String type;
