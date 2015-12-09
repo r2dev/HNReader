@@ -52,7 +52,6 @@ public class StoryAdapter extends ArrayAdapter<Item>{
             v.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    System.out.println(p);
                     //http://stackoverflow.com/questions/742171/longclick-event-also-triggers-click-event
                     // return true instead of false to avoid tragging simple click
                     Snackbar.make(v, null, Snackbar.LENGTH_LONG)
