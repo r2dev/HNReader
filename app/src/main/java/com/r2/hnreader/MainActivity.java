@@ -99,9 +99,14 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            //to do setting page!
-            Intent intent = new Intent(this, SettingsActivity.class);
+//        if (id == R.id.action_settings) {
+//            //to do setting page!
+//            Intent intent = new Intent(this, SettingsActivity.class);
+//            startActivity(intent);
+//            return true;
+//        }
+        if (id == R.id.action_about) {
+            Intent intent = new Intent(this, AboutActivity.class);
             startActivity(intent);
             return true;
         }

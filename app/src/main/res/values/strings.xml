@@ -16,5 +16,6 @@
         <item>1</item>
     </string-array>
     <string name="title_activity_user">User Info</string>
+    <string name="action_about">About</string>
 
 </resources>
