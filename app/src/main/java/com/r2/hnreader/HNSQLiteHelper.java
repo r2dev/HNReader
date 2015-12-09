@@ -24,19 +24,11 @@ public class HNSQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_ITEM_TITLE = "title";
     public static final String COLUMN_ITEM_DESC = "descendants";
     public static final String COLUMN_ITEM_TEXT = "text";
-    public static final String TABLE_TOP = "tops";
-    public static final String COLUMN_TOP_ID = "top_id";
-    public static final String COLUMN_TOP_ITEM_ID = "item_id";
 
     //item table create statement
     private static final String CREATE_TABLE_ITEM = "CREATE TABLE " + TABLE_ITEM + "(" + COLUMN_ITEM_ID + " INTEGER PRIMARY KEY," +
             COLUMN_ITEM_TYPE + " TEXT," + COLUMN_ITEM_AUTHOR + " TEXT," + COLUMN_ITEM_PARENT + " INTEGER," + COLUMN_ITEM_URL + " TEXT," +
             COLUMN_ITEM_SCORE + " INTEGER," + COLUMN_ITEM_TEXT + " TEXT," + COLUMN_ITEM_TITLE + " TEXT," + COLUMN_ITEM_DESC + " INTEGER);";
-    //top table create statement
-    private static final String CREATE_TABLE_TOP = "CREATE TABLE " + TABLE_TOP + "(" + COLUMN_TOP_ID + " INTEGER PRIMARY KEY," +
-            COLUMN_TOP_ITEM_ID + " INTEGER);";
-    //delete top table statement
-    private static final String DELETE_TABLE_TOP = "DELETE FROM " + TABLE_TOP + ";";
 
     public HNSQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -45,7 +37,6 @@ public class HNSQLiteHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TABLE_ITEM);
-        db.execSQL(CREATE_TABLE_TOP);
     }
 
     @Override
@@ -54,11 +45,7 @@ public class HNSQLiteHelper extends SQLiteOpenHelper {
                 "Upgrading database from version " + oldVersion + " to "
                         + newVersion + ", which will destroy all old data");
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_ITEM);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_TOP);
         onCreate(db);
     }
 
-    public void onDeleteTopTable(SQLiteDatabase db) {
-        db.execSQL(DELETE_TABLE_TOP);
-    }
 }

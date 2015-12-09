@@ -103,14 +103,4 @@ public class HNDataSource {
         return item;
     }
 
-    public void freshTopStoriesTable(List<Long> list) {
-        hnsqLiteHelper.onDeleteTopTable(sqLiteDatabase);
-        for (int i = 0; i != list.size(); i++) {
-            ContentValues values = new ContentValues();
-            values.put(HNSQLiteHelper.COLUMN_TOP_ITEM_ID, list.get(i));
-            sqLiteDatabase.insert(HNSQLiteHelper.TABLE_TOP, null, values);
-        }
-    }
-
-
 }

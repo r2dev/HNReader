@@ -16,7 +16,7 @@
         android:layout_gravity="center"
         android:textAlignment="center"
         android:textColor="@color/colorPrimary"/>
-    <TableLayout android:layout_width="280dp" android:layout_height="wrap_content"
+    <TableLayout android:layout_width="fill_parent" android:layout_height="wrap_content"
         android:orientation="vertical"  android:layout_gravity="center_vertical">
         <TableRow android:layout_width="wrap_content"
             android:id="@+id/TableRow01"
