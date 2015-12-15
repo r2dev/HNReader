@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_marginLeft="@dimen/fab_margin"
-        android:layout_marginBottom="50dp"
+        android:layout_marginBottom="60dp"
         android:src="@android:drawable/ic_menu_add"/>
 
     <android.support.design.widget.FloatingActionButton
@@ -38,7 +38,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_marginRight="80dp"
-        android:layout_marginBottom="50dp"
+        android:layout_marginBottom="60dp"
         android:src="@android:drawable/ic_menu_share"/>
 
 </android.support.design.widget.CoordinatorLayout>
