@@ -35,6 +35,10 @@ public class MainActivity extends AppCompatActivity {
     private boolean internetConnection;
     private ListView listView;
     private static boolean loadingMore = false;
+    private FloatingActionButton fabAddButton;
+    private FloatingActionButton fabShardButton;
+    private FloatingActionButton fabUserButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         internetConnection = false;
@@ -42,16 +46,17 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        FloatingActionButton fabAddButton = (FloatingActionButton)findViewById(R.id.fab_add);
-        FloatingActionButton fabShardButton = (FloatingActionButton)findViewById(R.id.fab_share);
+        fabAddButton = (FloatingActionButton)findViewById(R.id.fab_add);
+        fabShardButton = (FloatingActionButton)findViewById(R.id.fab_share);
+        fabUserButton = (FloatingActionButton)findViewById(R.id.fab_people);
         fabAddButton.hide();
         fabShardButton.hide();
-
+        fabUserButton.hide();
         internetConnection = checkInternetConnection();
         listView = (ListView) findViewById(R.id.listView);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         itemArrayAdapter = new StoryAdapter(this, R.layout.story_row, items,
-                fabAddButton, fabShardButton, MainActivity.this);
+                fabAddButton, fabShardButton, fabUserButton, MainActivity.this);
         //query list item from top
         if (internetConnection) {
             if (items.size() == 0 && idArray.size() == 0) {
@@ -61,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
                 new ItemsNetworkRequest().execute(items.size());
             }
             listView.setAdapter(itemArrayAdapter);
+
         } else {
             progressBar.setVisibility(View.INVISIBLE);
             Toast.makeText(this, "No Internet Connection", Toast.LENGTH_LONG).show();
@@ -227,6 +233,9 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                    fabAddButton.hide();
+                    fabShardButton.hide();
+                    fabUserButton.hide();
                     if (totalItemCount != 0) {
                         int lastInScreen = firstVisibleItem + visibleItemCount;
                         if (lastInScreen == items.size() && (loadingMore)) {

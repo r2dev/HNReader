@@ -25,12 +25,14 @@ public class LocalDataActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         FloatingActionButton fabShare = (FloatingActionButton) findViewById(R.id.fab_share_2);
+        FloatingActionButton fabPeople = (FloatingActionButton) findViewById(R.id.fab_people_2);
         ListView listView = (ListView) findViewById(R.id.listView2);
         fabShare.hide();
+        fabPeople.hide();
         dataSource = new HNDataSource(this);
         dataSource.openForReading();
         itemList = dataSource.getItems();
-        ArrayAdapter<Item> itemArrayAdapter = new StoryAdapter(this, R.layout.story_row, itemList, null, fabShare, LocalDataActivity.this);
+        ArrayAdapter<Item> itemArrayAdapter = new StoryAdapter(this, R.layout.story_row, itemList, null, fabShare, fabPeople, LocalDataActivity.this);
         listView.setAdapter(itemArrayAdapter);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }

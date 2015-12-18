@@ -19,16 +19,17 @@ import java.util.List;
  * custom story adapter
  */
 public class StoryAdapter extends ArrayAdapter<Item>{
-    private FloatingActionButton fabAdd, fabShare;
+    private FloatingActionButton fabAdd, fabShare, fabPeople;
     private HNDataSource dataSource;
     private Activity act;
     public StoryAdapter(Context context, int resource) {
         super(context, resource);
     }
-    public StoryAdapter(Context context, int resource, List<Item> objects, FloatingActionButton fab_add, FloatingActionButton fab_share, Activity activity) {
+    public StoryAdapter(Context context, int resource, List<Item> objects, FloatingActionButton fab_add, FloatingActionButton fab_share, FloatingActionButton fab_people, Activity activity) {
         super(context, resource, objects);
         fabAdd = fab_add;
         fabShare = fab_share;
+        fabPeople = fab_people;
         act = activity;
         dataSource = new HNDataSource(activity);
         dataSource.openForWriting();
@@ -54,62 +55,37 @@ public class StoryAdapter extends ArrayAdapter<Item>{
                 public boolean onLongClick(View v) {
                     //http://stackoverflow.com/questions/742171/longclick-event-also-triggers-click-event
                     // return true instead of false to avoid tragging simple click
-                    Snackbar.make(v, null, Snackbar.LENGTH_LONG)
-                            .setAction("by " + p.getBy() + " " + getTimeAgo(p.getTime()), new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    Intent intent = new Intent(act, UserActivity.class);
-                                    intent.putExtra("username", p.getBy());
-                                    act.startActivity(intent);
-                                }
-                            })
-                            .setCallback(new Snackbar.Callback() {
-                                @Override
-                                public void onDismissed(Snackbar snackbar, int event) {
-                                    if (fabAdd != null) {
-                                        fabAdd.hide();
-                                    }
-                                    fabShare.hide();
-                                    super.onDismissed(snackbar, event);
-                                }
+                    if (fabAdd != null) {
+                        fabAdd.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                dataSource.insertItem(p);
+                                Toast.makeText(act, "Favorite", Toast.LENGTH_LONG).show();
+                            }
+                        });
+                        fabAdd.show();
+                    }
+                    fabPeople.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent = new Intent(act, UserActivity.class);
+                            intent.putExtra("username", p.getBy());
+                            act.startActivity(intent);
+                        }
+                    });
+                    fabShare.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                            shareIntent.setType("text/plain");
+                            shareIntent.putExtra(Intent.EXTRA_SUBJECT, p.getTitle());
+                            shareIntent.putExtra(Intent.EXTRA_TEXT, p.getUrl());
+                            act.startActivity(Intent.createChooser(shareIntent, "Share Story URL"));
+                        }
+                    });
 
-                                @Override
-                                public void onShown(final Snackbar snackbar) {
-                                    super.onShown(snackbar);
-                                    if (fabAdd != null) {
-                                        fabAdd.setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                dataSource.insertItem(p);
-                                                Toast.makeText(act, "Favorite", Toast.LENGTH_LONG).show();
-                                                snackbar.dismiss();
-                                                fabAdd.hide();
-                                                fabShare.hide();
-
-                                            }
-                                        });
-                                    }
-                                    fabShare.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                                            shareIntent.setType("text/plain");
-                                            shareIntent.putExtra(Intent.EXTRA_SUBJECT, p.getTitle());
-                                            shareIntent.putExtra(Intent.EXTRA_TEXT, p.getUrl());
-                                            act.startActivity(Intent.createChooser(shareIntent, "Share Story URL"));
-                                            snackbar.dismiss();
-                                            if (fabAdd != null) {
-                                                fabAdd.hide();
-                                            }
-                                            fabShare.hide();
-                                        }
-                                    });
-                                    if (fabAdd != null) {
-                                        fabAdd.show();
-                                    }
-                                    fabShare.show();
-                                }
-                            }).show();
+                    fabPeople.show();
+                    fabShare.show();
                     return true;
                 }
             });

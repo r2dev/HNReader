@@ -80,10 +80,10 @@ public class UserActivity extends AppCompatActivity {
      * User class for parsing
      */
     private class User {
-        private String about;
+        private String about = "";
         private long created;
         private long delay;
-        private String id;
+        private String id = "";
         private long karma;
 
         public String getAbout() {

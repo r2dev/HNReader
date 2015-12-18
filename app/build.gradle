@@ -3,9 +3,9 @@ apply plugin: 'com.android.application'
 android {
     signingConfigs {
         config {
-            keyAlias 'HNReaderKey'
+            keyAlias 'androiddebugkey'
             keyPassword 'android'
-            storeFile file('C:/Users/R2/Desktop/important/key.jks')
+            storeFile file('C:/Users/R2/Desktop/important/key2.jks')
             storePassword 'android'
         }
     }
