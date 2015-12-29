@@ -1,11 +1,17 @@
 package com.r2.hnreader;
 
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.Icon;
 import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.os.Bundle;
+import android.support.v4.app.BundleCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,15 +19,22 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * custom story adapter
  */
 public class StoryAdapter extends ArrayAdapter<Item>{
+    private static final String EXTRA_CUSTOM_TABS_SESSION = "android.support.customtabs.extra.SESSION";
+    private static final String EXTRA_CUSTOM_TABS_TOOLBAR_COLOR = "android.support.customtabs.extra.TOOLBAR_COLOR";
+    public static final String KEY_CUSTOM_TABS_MENU_TITLE = "android.support.customtabs.customaction.MENU_ITEM_TITLE";
+    public static final String EXTRA_CUSTOM_TABS_MENU_ITEMS = "android.support.customtabs.extra.MENU_ITEMS";
+    public static final String KEY_CUSTOM_TABS_PENDING_INTENT = "android.support.customtabs.customaction.PENDING_INTENT";
     private FloatingActionButton fabAdd, fabShare, fabPeople;
     private HNDataSource dataSource;
     private Activity act;
+
     public StoryAdapter(Context context, int resource) {
         super(context, resource);
     }
@@ -81,6 +94,7 @@ public class StoryAdapter extends ArrayAdapter<Item>{
                             shareIntent.putExtra(Intent.EXTRA_SUBJECT, p.getTitle());
                             shareIntent.putExtra(Intent.EXTRA_TEXT, p.getUrl());
                             act.startActivity(Intent.createChooser(shareIntent, "Share Story URL"));
+
                         }
                     });
 
@@ -99,8 +113,24 @@ public class StoryAdapter extends ArrayAdapter<Item>{
                     v.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
+                            Bundle menuItem = new Bundle();
+                            ArrayList menuItemBundleList = new ArrayList<>();
+                            menuItem.putString(KEY_CUSTOM_TABS_MENU_TITLE, "Share");
                             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(p.getUrl()));
-                            getContext().startActivity(intent);
+                            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                            shareIntent.setType("text/plain");
+                            shareIntent.putExtra(Intent.EXTRA_SUBJECT, p.getTitle());
+                            shareIntent.putExtra(Intent.EXTRA_TEXT, p.getUrl());
+                            PendingIntent pendingIntent = PendingIntent.getActivity(act.getApplicationContext(), 0,
+                                    shareIntent, 0);
+                            menuItem.putParcelable(KEY_CUSTOM_TABS_PENDING_INTENT, pendingIntent);
+                            menuItemBundleList.add(menuItem);
+                            Bundle extras = new Bundle();
+                            extras.putBinder(EXTRA_CUSTOM_TABS_SESSION, null);
+                            extras.putInt(EXTRA_CUSTOM_TABS_TOOLBAR_COLOR, getContext().getColor(R.color.colorPrimary));
+                            extras.putParcelableArrayList(EXTRA_CUSTOM_TABS_MENU_ITEMS, menuItemBundleList);
+                            intent.putExtras(extras);
+                            act.startActivity(intent);
                         }
                     });
                 } else {
